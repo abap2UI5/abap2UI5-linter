@@ -384,10 +384,16 @@ body {
 }
 .wrap { max-width: 62rem; margin: 0 auto; padding: 2.5rem 1.25rem 6rem; }
 a { color: var(--link); }
+/* inline code carries UI5 identifiers with no break opportunity in them -
+   mEventRegistry, addCustomCurrencies, sap.ui.unified.RecurringCalendarAppointment.
+   Without a break anywhere they push the page wider than a phone and the whole
+   document scrolls sideways, so every line of prose drifts out of view. Inside
+   a pre it is the opposite: the block scrolls on its own and ABAP wrapped
+   mid-identifier stops being copyable code, so the reset below keeps it whole. */
 code { background: var(--code-bg); padding: .1em .35em; border-radius: 4px; font-size: .9em;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  overflow-wrap: anywhere; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
 pre { background: var(--code-bg); padding: .85rem 1rem; border-radius: 8px; overflow-x: auto; }
-pre code { background: none; padding: 0; }
+pre code { background: none; padding: 0; overflow-wrap: normal; }
 header h1 { margin: 0 0 .25rem; font-size: 2rem; letter-spacing: -.02em; }
 header p.lede { margin: 0 0 1.25rem; color: var(--muted); font-size: 1.05rem; }
 .counts { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.5rem; }

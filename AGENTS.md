@@ -1077,6 +1077,15 @@ never reaches the package. Treat it as documentation that happens to execute.
   serves the committed file, it never regenerates it: a generator running in
   CI would paper over a stale commit instead of failing on it. Pages has to be
   enabled once in the repository settings, source "GitHub Actions".
+- **The page is read on a phone, and its prose is full of unbreakable
+  identifiers.** `mEventRegistry`, `addCustomCurrencies`,
+  `sap.ui.unified.RecurringCalendarAppointment` — a UI5 name has no hyphen or
+  space to break at, so a single one in inline `<code>` used to push the whole
+  document wider than the screen (measured 185px past a 320px viewport, 115px
+  past 390px) and every line of prose scrolled sideways with it. The stylesheet
+  gives inline code `overflow-wrap: anywhere` and takes it back for `pre code`,
+  where the block scrolls on its own and a line broken mid-identifier stops
+  being code anyone can copy. `npm test` gates both halves.
 - `.github/workflows/bundle.yml` maintains the rolling prerelease tag
   **`render-gate-bundle`** with `view-check-bundle.tgz` (cli + lib + data +
   prod node_modules). **Installed VS Code extensions download this bundle at
