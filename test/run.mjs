@@ -5250,6 +5250,21 @@ section('rules page', async () => {
     const page = fs.readFileSync(PAGE_FILE, 'utf8');
     assert(page === buildPage(), 'rules page: site/index.html is in sync (npm run generate-rules-page)');
 
+    /* The page is one document with no layout to speak of, so the only thing
+     * that can push it wider than the reader's screen is a word with no break
+     * opportunity in it - and the prose is full of them, because the rules are
+     * about UI5: mEventRegistry, addCustomCurrencies,
+     * sap.ui.unified.RecurringCalendarAppointment. Without the break the whole
+     * document scrolled sideways on a phone (measured: 185px past a 320px
+     * viewport, 115px past 390px), which drags every line of prose out of view,
+     * not just the identifier. Inside a `pre` the opposite holds - the block
+     * scrolls on its own and an ABAP line broken mid-identifier stops being
+     * code you can copy - so the reset has to survive too. */
+    assert(/\bcode \{[^}]*overflow-wrap: anywhere/.test(page),
+      'rules page: an identifier in inline code can break rather than widen the page');
+    assert(/\bpre code \{[^}]*overflow-wrap: normal/.test(page),
+      'rules page: code inside a pre stays unbroken and scrolls with its block');
+
     /* The jump into the playground: the reported snippet wrapped into a class,
      * in the playground's own share-link format, and only on a card whose rule
      * the linter itself reports on that class - a link that opens on a clean
