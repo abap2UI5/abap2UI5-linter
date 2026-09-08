@@ -355,6 +355,40 @@ export const UI5_VERSION = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'p
  * and the SARIF helpUri points here, so it needs its card. */
 const PAGE_RULES = [...RULES, RENDER_RULE].sort();
 
+/* Where this page is published, and what it says about itself. One origin
+ * carries all four deployments (pages.yml puts this one under /linter/), so an
+ * absolute URL here is same-origin at read time and correct in a share card,
+ * which is the one place a relative one would be wrong. */
+const ORIGIN = 'https://abap2ui5.github.io';
+const PAGE_URL = `${ORIGIN}/linter/`;
+const DESCRIPTION = 'Every rule the abap2UI5 view linter reports: what it means, '
+  + 'how severe it is, and how to configure or waive it.';
+
+/* What kind of document this is, for a machine. A reference work rather than an
+ * article: TechArticle with the rule count, so a search result can say so, and
+ * the breadcrumb the reader already sees in the address. */
+const LD_JSON = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'TechArticle',
+    name: 'abap2UI5 linter rules',
+    headline: 'abap2UI5 linter rules',
+    description: DESCRIPTION,
+    url: PAGE_URL,
+    inLanguage: 'en',
+    isPartOf: { '@type': 'WebSite', name: 'abap2UI5', url: ORIGIN },
+    about: { '@type': 'SoftwareSourceCode', name: '@abap2ui5/linter', codeRepository: REPO },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'abap2UI5', item: ORIGIN },
+      { '@type': 'ListItem', position: 2, name: 'Linter rules', item: PAGE_URL },
+    ],
+  },
+];
+
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
 /** The little bit of markdown the prose uses: `code` and **strong**. */
@@ -383,6 +417,20 @@ body {
   font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 .wrap { max-width: 62rem; margin: 0 auto; padding: 2.5rem 1.25rem 6rem; }
+/* Off-screen, not display:none - a label nobody can reach is a label a screen
+   reader skips too. The clip rectangle is the standard one. */
+.sr-only {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+/* Out of the way until it has focus, and then the first thing on the page. */
+.skip {
+  position: absolute; left: -9999px; top: 0; z-index: 10;
+  background: var(--bg); color: var(--link); padding: .6rem 1rem;
+  border: 1px solid var(--line); border-radius: 0 0 8px 0;
+}
+.skip:focus { left: 0; }
+main:focus { outline: none; }
 a { color: var(--link); }
 /* inline code carries UI5 identifiers with no break opportunity in them -
    mEventRegistry, addCustomCurrencies, sap.ui.unified.RecurringCalendarAppointment.
@@ -513,10 +561,43 @@ export function buildPage() {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>abap2UI5 linter rules</title>
-<meta name="description" content="Every rule the abap2UI5 view linter reports: what it means, how severe it is, and how to configure or waive it.">
+<meta name="description" content="${DESCRIPTION}">
+<link rel="canonical" href="${PAGE_URL}">
+<!-- The head the other three deployments already carry, and this one did not:
+     shared to Slack or LinkedIn this page was a bare link with no title and no
+     picture, its tab wore the browser's default icon, and a search result had
+     no idea what kind of document it is. The icon and the card image are the
+     playground's - one origin, one mark, and this deployment publishes a
+     single file (pages.yml, path: site), so a copy here would be a second
+     thing to keep in step for no gain. -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="abap2UI5">
+<meta property="og:locale" content="en_US">
+<meta property="og:title" content="abap2UI5 linter rules">
+<meta property="og:description" content="${DESCRIPTION}">
+<meta property="og:url" content="${PAGE_URL}">
+<meta property="og:image" content="${ORIGIN}/playground/og-image.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="abap2UI5 - Build UI5 Apps Purely in ABAP">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="abap2UI5 linter rules">
+<meta name="twitter:description" content="${DESCRIPTION}">
+<meta name="twitter:image" content="${ORIGIN}/playground/og-image.png">
+<link rel="icon" href="${ORIGIN}/playground/favicon.png">
+<link rel="apple-touch-icon" href="${ORIGIN}/playground/apple-touch-icon.png">
+<meta name="theme-color" content="#f4f5f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f1216" media="(prefers-color-scheme: dark)">
+<script type="application/ld+json">${JSON.stringify(LD_JSON)}</script>
 <style>${CSS}</style>
 </head>
 <body>
+<!-- 371 things on this page can take focus - every rule id, every playground
+     link. Without this, a keyboard reaching the content meant tabbing past all
+     of them, and reaching the FILTER meant tabbing past the header every time.
+     It is the first stop, and it is only visible while it holds focus. -->
+<a class="skip" href="#rules">Skip to the rules</a>
 <div class="wrap">
   <header>
     <h1>abap2UI5 linter rules</h1>
@@ -531,12 +612,19 @@ export function buildPage() {
     <p class="stamp">Generated from <strong>v${VERSION}</strong>, against the OpenUI5 ${UI5_VERSION} metadata
       snapshot. This page follows <code>main</code>; your pinned CLI reports the rules of the version it is.
       <code>npx abap2ui5lint --version</code> says which that is.</p>
+    <!-- A placeholder is not a label: it names the field only until the first
+         keystroke, and a screen reader announcing "search" and nothing else
+         leaves the page's main control unnamed. The label says what it does
+         and is drawn off-screen, because the placeholder already says it to
+         everyone who can see it. -->
+    <label class="sr-only" for="filter">Filter the rules by id, wording or severity</label>
     <input id="filter" type="search" placeholder="Filter ${RULES.length} rules + ${RENDER_RULE} — id, wording, severity" autocomplete="off" spellcheck="false">
     <p class="hint-line">The id is what the linter prints at the end of every reported line, what the
       <code>rules</code> block of <code>abap2ui5lint.jsonc</code> is keyed by, and what a
       <code>abap2ui5lint-disable-next-line</code> comment names.</p>
   </header>
 
+  <main id="rules">
   <p class="empty">No rule matches that.</p>
 
   <section class="cat" id="cat-usage">
@@ -562,6 +650,7 @@ export function buildPage() {
   </section>
 
 ${sections}
+  </main>
 
   <footer>
     Generated from the rule registry of
