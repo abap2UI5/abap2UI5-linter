@@ -1077,6 +1077,20 @@ never reaches the package. Treat it as documentation that happens to execute.
   serves the committed file, it never regenerates it: a generator running in
   CI would paper over a stale commit instead of failing on it. Pages has to be
   enabled once in the repository settings, source "GitHub Actions".
+- **It is a deployment like the other three, and its head now says so.** It
+  had no canonical url, no Open Graph or Twitter card, no favicon, no
+  theme-colour and no ld+json — shared to Slack it was a bare link, and its tab
+  wore the browser's default icon. It carries all of them now; the icon and the
+  card image are the **playground's**, because one origin serves all four and
+  this deployment publishes a single file (`pages.yml`, `path: site`), so a
+  copy here would be a second thing to keep in step for no gain.
+- **372 things on this page take focus**, every rule id and every playground
+  link among them. Reaching the rules from the keyboard meant tabbing past all
+  of them, so the first stop in the body is a skip link — visible only while it
+  holds focus — and the cards sit in a `<main id="rules">` that had no landmark
+  at all before. The filter has a real `<label>` too: a placeholder names a
+  field until the first keystroke and a screen reader read the page's one
+  control as an unnamed search box.
 - **The page is read on a phone, and its prose is full of unbreakable
   identifiers.** `mEventRegistry`, `addCustomCurrencies`,
   `sap.ui.unified.RecurringCalendarAppointment` — a UI5 name has no hyphen or

@@ -5272,6 +5272,37 @@ section('rules page', async () => {
     assert(/\bpre code \{[^}]*overflow-wrap: normal/.test(page),
       'rules page: code inside a pre stays unbroken and scrolls with its block');
 
+    /* The head the other three deployments carry, and the two things a
+     * keyboard and a screen reader need. None of this was here: shared to
+     * Slack the page was a bare link, its tab wore the browser's default icon,
+     * the content sat in no landmark, and the FILTER - the one control the
+     * page has - had a placeholder and no label, which a screen reader reads
+     * as an unnamed search box. 372 things on this page take focus, so the
+     * skip link is not a nicety either: without it, reaching the rules from
+     * the keyboard meant tabbing past every rule id and every playground link
+     * on the way. */
+    for (const [what, present] of [
+      ['a canonical url', /<link rel="canonical" href="https:\/\/abap2ui5\.github\.io\/linter\/">/],
+      ['an og:title', /<meta property="og:title"/],
+      ['an og:image', /<meta property="og:image" content="[^"]+og-image\.png">/],
+      ['a twitter card', /<meta name="twitter:card"/],
+      ['a favicon', /<link rel="icon"/],
+      ['a theme colour for both schemes', /prefers-color-scheme: dark\)">/],
+      ['ld\+json saying what it is', /"@type":"TechArticle"/],
+      ['a main landmark', /<main id="rules">/],
+      ['a skip link, first in the body', /<body>\s*(?:<!--[\s\S]*?-->\s*)?<a class="skip" href="#rules">/],
+      ['a label on the filter', /<label class="sr-only" for="filter">/],
+    ]) {
+      assert(present.test(page), `rules page: the page has ${what}`);
+    }
+
+    /* …and the label is a REAL one, not a duplicate of the placeholder that
+     * disappears with it. The placeholder counts the rules; the label says
+     * what the field does. */
+    assert(/<label class="sr-only" for="filter">Filter the rules by/.test(page)
+      && /<input id="filter" type="search" placeholder="Filter \d+ rules/.test(page),
+      'rules page: the filter has both a label and its placeholder, saying different things');
+
     /* The jump into the playground: the reported snippet wrapped into a class,
      * in the playground's own share-link format, and only on a card whose rule
      * the linter itself reports on that class - a link that opens on a clean
