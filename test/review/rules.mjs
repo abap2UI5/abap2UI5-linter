@@ -157,6 +157,80 @@ export default async function ({ section, assert, checkAbapSource }) {
     assert(of(out, 'unconverted-abap-boolean').length === 0, 'the fixed class is clean');
   });
 
+  section('review rules: a value carrying data is reported on v, and the fix moves it onto t', () => {
+    const src = frame({
+      defs: '    DATA mv_search TYPE string.\n    DATA mv_flag TYPE abap_bool.\n'
+        + '    DATA: BEGIN OF ms_row, name TYPE string, END OF ms_row.\n',
+      main: '    DATA(lv_title) = |Results for { mv_search }|.\n'
+        + '    DATA(lv_expr) = |\\{= ${ client->_bind( mv_search ) } === `x` \\}|.\n'
+        + '    DATA(lv_const) = `A constant`.\n'
+        + '    DATA(lv_base) = `https://host/`.\n',
+      attrs: '            )->a( n = `tooltip`     v = |Hits for { mv_search }|\n'
+        + '            )->a( n = `id`          v = lv_title\n'
+        + '            )->a( n = `busy`        v = mv_flag\n'
+        + '            )->a( n = `icon`        v = lv_expr\n'
+        + '            )->a( n = `activeIcon`  v = lv_const\n'
+        + '            )->a( n = `ariaLabelledBy` v = ms_row-name\n'
+        + '            )->a( n = `fieldGroupIds` v = lv_base && `x.jpg`\n'
+        + '            )->a( n = `width`       v = CONV string( mv_search )\n'
+        + '            )->a( n = `type`        v = `Emphasized`\n'
+        + '            )->a( n = `press`       v = client->_event( `GO` )\n'
+        + '            )->a( n = `visible`     v = |\\{= ${ client->_bind( mv_search ) } !== `` \\}|\n'
+        + '            )->a( n = `blocked`     v = |{ z2ui5_cl_ui5_view_builder=>escape_literal( mv_search ) }: \\{/COUNT\\}|\n'
+        + '            )->a( n = `enabled`     v = COND #( WHEN mv_flag = abap_true THEN `x` ELSE `y` )\n',
+    });
+    const found = of(src, 'unescaped-text-in-attribute');
+    const members = found.map((x) => x.member).sort().join();
+    assert(members === 'activeIcon,ariaLabelledBy,fieldGroupIds,id,tooltip,width',
+      `the six values whose origin is data are reported, nothing else (${members || 'none'})`);
+    assert(found.every((x) => x.fixes?.length === 1 && x.fixes[0].text === 't'), 'every one carries the v-to-t fix');
+    assert(of(src, 'unconverted-abap-boolean').length === 1, 'the boolean stays the boolean rule\'s');
+    const out = fixed(src);
+    assert(/n = `tooltip`     t = \|Hits for \{ mv_search \}\|/.test(out) && /n = `id`          t = lv_title/.test(out),
+      'the fix renames the parameter and leaves the value as written');
+    assert(/n = `icon`        v = lv_expr/.test(out) && /n = `type`        v = `Emphasized`/.test(out),
+      'a binding held in a variable and a constant stay on v');
+    assert(of(out, 'unescaped-text-in-attribute').length === 0, 'the fixed class is clean');
+  });
+
+  section('review rules: a name assigned binding vocabulary anywhere in the class stays on v', () => {
+    const late = frame({
+      defs: '    DATA mv_wrap TYPE string.\n',
+      main: '    IF 1 = 2.\n      mv_wrap = `plain`.\n    ELSE.\n'
+        + '      mv_wrap = |\\{= ${ client->_bind( mv_text ) } ? `Hyphenated` : `Normal` \\}|.\n    ENDIF.\n',
+      attrs: '            )->a( n = `tooltip` v = mv_wrap\n',
+    });
+    assert(of(late, 'unescaped-text-in-attribute').length === 0, 'one assignment with vocabulary is enough to keep the name on v');
+    const seeded = frame({
+      defs: '    TYPES: BEGIN OF ty_row, label TYPE string, END OF ty_row.\n    DATA mt_rows TYPE STANDARD TABLE OF ty_row WITH EMPTY KEY.\n',
+      main: '    mt_rows = VALUE #( ( label = `{/X}` ) ).\n    LOOP AT mt_rows REFERENCE INTO DATA(lr_row).\n    ENDLOOP.\n',
+      attrs: '            )->a( n = `tooltip` v = lr_row->label\n',
+    });
+    assert(of(seeded, 'unescaped-text-in-attribute').length === 1,
+      'a seed row holding a literal binding without an escape is still data - it is the value the rule exists for');
+    const unassigned = frame({ attrs: '            )->a( n = `tooltip` v = lr_row->label\n' });
+    assert(of(unassigned, 'unescaped-text-in-attribute').length === 1, 'a name nothing in the class writes is data by definition');
+  });
+
+  section('review rules: a t attribute reconstructs escaped, as the running view carries it', async () => {
+    const { prepareAbap } = await import('../../lib/reconstruct.mjs');
+    const src = frame({
+      main: '    DATA(lv_t) = `a {b} c\\d`.\n',
+      attrs: '            )->a( n = `tooltip` t = lv_t\n            )->a( n = `id` t = `t_one`\n',
+    });
+    const r = prepareAbap(src);
+    assert(/tooltip="a \\\{b\\\} c\\\\d"/.test(r.docs[0] ?? ''), `the braces and the backslash are escaped (${r.docs[0]})`);
+    assert(!r.notes.some((n) => /unparsed attribute call/.test(n)), 'a t attribute is no longer an unparsed call');
+    const noise = judge(src).map((x) => x.type);
+    assert(noise.length === 0, `a t attribute reports nothing (${noise.join(', ') || 'none'})`);
+    // an id written as text still counts as this class's id
+    const wired = frame({
+      attrs: '            )->a( n = `id` t = `btn_t`\n',
+      main: '    client->follow_up_action( val = client->cs_event-control_by_id t_arg = VALUE #( ( `btn_t` ) ( `focus` ) ) ).\n',
+    });
+    assert(of(wired, 'frontend-action-unknown-id').length === 0, 'an id passed through t is known to the wire rules');
+  });
+
   section('review rules: chained declarations are read by the binding rules', () => {
     const refs = frame({
       defs: '    DATA: mr_a TYPE REF TO data, mr_b TYPE REF TO data.\n',

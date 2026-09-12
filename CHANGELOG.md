@@ -2,6 +2,24 @@
 
 ## Unreleased
 
+- **`a( t = … )` is read, and a value carrying data on `v =` is a finding.**
+  abap2UI5's view builder takes text through a third parameter now: `t` applies
+  `escape_literal( )` to the whole value, so a brace or backslash in it is
+  shown instead of parsed as a binding. The reconstructor read `t` as an
+  "unparsed attribute call" and dropped the attribute with nothing but a note;
+  it resolves like `v` now and is escaped the way the class escapes it
+  (`escapeLiteral( )` from `./reconstruct`), and an id written through `t`
+  counts as the class's id for the wire rules. The new rule
+  `unescaped-text-in-attribute` (warning, fixable) reports a `v =` whose
+  ORIGIN is data — a `|…|` template that interpolates, a name whose
+  assignments in the class show no binding vocabulary, `CONV string( )`, a
+  `name && \`literal\`` chain — and leaves a literal, a method call, a
+  `COND`/`SWITCH`, an ABAP boolean and anything that shows a bind, an event,
+  a wire, an escaped brace or an `escape_literal( )` alone: assembling a
+  binding in a variable and passing it through `v` is what `v` is for. The
+  fix renames the parameter. This is the ui5-check entry that stood "blocked
+  on origin"; the origin is read out of the class.
+
 - **ABAP is case-insensitive, and now the linter is too.** Outside its
   literals and comments ABAP does not care about case, and a pretty printer set
   to "uppercase" or "lowercase" produces exactly the source the linter used to
