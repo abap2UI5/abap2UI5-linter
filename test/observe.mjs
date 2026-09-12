@@ -53,5 +53,12 @@ export const checkFiles = async (...args) => {
   return results;
 };
 
+/** The source-side entry a class that builds no view is judged by. */
+export const checkSourceRules = (...args) => {
+  const findings = abapRules.checkSourceRules(...args);
+  note(findings);
+  return findings;
+};
+
 export const { namedModels } = abapRules;
 export const { collectFiles } = index;

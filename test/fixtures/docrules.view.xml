@@ -1,0 +1,10 @@
+<mvc:View xmlns="sap.m" xmlns:mvc="sap.ui.core.mvc" xmlns:core="sap.ui.core" xmlns:l="sap.ui.layout" xmlns:f="sap.f" xmlns:template="http://schemas.sap.com/sapui5/extension/sap.ui.core.template/1" template:require="{}">
+  <Page title="links" class="sapUiContentPadding myPage">
+    <core:Icon src="sap-icon://home"/>
+    <Link text="no target" href="https://sdk.openui5.org/"/>
+    <Link text="has target" href="https://sdk.openui5.org/" target="_blank"/>
+    <Link text="relative" href="#/detail"/>
+    <Link text="bound" href="{/URL}"/>
+    <Image src="http://example.org/a.png"/>
+  </Page>
+</mvc:View>

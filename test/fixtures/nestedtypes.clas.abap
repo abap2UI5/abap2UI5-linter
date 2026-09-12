@@ -17,7 +17,7 @@ CLASS zcl_fixture_nestedtypes DEFINITION PUBLIC.
         END OF s_details,
       END OF ty_s_row.
 
-    DATA t_rows  TYPE STANDARD TABLE OF ty_s_row.
+    DATA t_rows  TYPE STANDARD TABLE OF ty_s_row WITH EMPTY KEY.
     DATA s_head  TYPE ty_s_row.
 ENDCLASS.
 

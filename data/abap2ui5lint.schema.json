@@ -124,7 +124,7 @@
           "description": "One entry per badge kind."
         }
       ],
-      "description": "Write shields.io endpoint JSON for every run, so the README can show what the corpus IS (\"abap2UI5 | 148 apps · 172 views · 2,176 controls\") and what the gate said about it (\"check-abap2UI5 | 125 rules passed\")."
+      "description": "Write shields.io endpoint JSON for every run, so the README can show what the corpus IS (\"abap2UI5 | 148 apps · 172 views · 2,176 controls\") and what the gate said about it (\"check-abap2UI5 | 134 rules passed\")."
     },
     "rules": {
       "type": "object",
@@ -134,6 +134,10 @@
         "abap-date-formatter-mismatch": {
           "$ref": "#/definitions/rule",
           "description": "abap2UI5 linter rule 'abap-date-formatter-mismatch' — default severity: error"
+        },
+        "abapdoc-html-tag": {
+          "$ref": "#/definitions/rule",
+          "description": "abap2UI5 linter rule 'abapdoc-html-tag' — default severity: warning"
         },
         "absent-boolean-overrides-default": {
           "$ref": "#/definitions/rule",
@@ -199,6 +203,10 @@
           "$ref": "#/definitions/rule",
           "description": "abap2UI5 linter rule 'class-constructor-visibility' — default severity: error"
         },
+        "client-handle-capture": {
+          "$ref": "#/definitions/rule",
+          "description": "abap2UI5 linter rule 'client-handle-capture' — default severity: warning"
+        },
         "collapsed-brace-in-style": {
           "$ref": "#/definitions/rule",
           "description": "abap2UI5 linter rule 'collapsed-brace-in-style' — default severity: error"
@@ -238,6 +246,10 @@
         "date-type-without-source": {
           "$ref": "#/definitions/rule",
           "description": "abap2UI5 linter rule 'date-type-without-source' — default severity: error"
+        },
+        "default-key-table": {
+          "$ref": "#/definitions/rule",
+          "description": "abap2UI5 linter rule 'default-key-table' — default severity: warning"
         },
         "delete-index-in-loop": {
           "$ref": "#/definitions/rule",
@@ -299,6 +311,10 @@
           "$ref": "#/definitions/rule",
           "description": "abap2UI5 linter rule 'escaped-brace-in-backtick' — default severity: error"
         },
+        "event-arg-default-index": {
+          "$ref": "#/definitions/rule",
+          "description": "abap2UI5 linter rule 'event-arg-default-index' — default severity: hint"
+        },
         "event-arg-js-callback": {
           "$ref": "#/definitions/rule",
           "description": "abap2UI5 linter rule 'event-arg-js-callback' — default severity: error"
@@ -335,6 +351,10 @@
           "$ref": "#/definitions/rule",
           "description": "abap2UI5 linter rule 'excess-shut' — default severity: error"
         },
+        "external-link-without-target": {
+          "$ref": "#/definitions/rule",
+          "description": "abap2UI5 linter rule 'external-link-without-target' — default severity: hint"
+        },
         "filter-groups-not-arrays": {
           "$ref": "#/definitions/rule",
           "description": "abap2UI5 linter rule 'filter-groups-not-arrays' — default severity: error"
@@ -366,6 +386,10 @@
         "icon-too-new": {
           "$ref": "#/definitions/rule",
           "description": "abap2UI5 linter rule 'icon-too-new' — default severity: warning"
+        },
+        "insecure-asset-url": {
+          "$ref": "#/definitions/rule",
+          "description": "abap2UI5 linter rule 'insecure-asset-url' — default severity: error"
         },
         "into-corresponding-inline-decl": {
           "$ref": "#/definitions/rule",
@@ -551,6 +575,10 @@
           "$ref": "#/definitions/rule",
           "description": "abap2UI5 linter rule 'ui5-internal-access' — default severity: warning"
         },
+        "unbound-public-attribute": {
+          "$ref": "#/definitions/rule",
+          "description": "abap2UI5 linter rule 'unbound-public-attribute' — default severity: warning"
+        },
         "unconditional-popup-display": {
           "$ref": "#/definitions/rule",
           "description": "abap2UI5 linter rule 'unconditional-popup-display' — default severity: warning"
@@ -566,6 +594,10 @@
         "undeclared-namespace": {
           "$ref": "#/definitions/rule",
           "description": "abap2UI5 linter rule 'undeclared-namespace' — default severity: error"
+        },
+        "undefined-css-class": {
+          "$ref": "#/definitions/rule",
+          "description": "abap2UI5 linter rule 'undefined-css-class' — default severity: hint"
         },
         "unescaped-brace-in-style": {
           "$ref": "#/definitions/rule",
@@ -614,6 +646,10 @@
         "unresolved-attribute-value": {
           "$ref": "#/definitions/rule",
           "description": "abap2UI5 linter rule 'unresolved-attribute-value' — default severity: hint"
+        },
+        "unused-namespace-declaration": {
+          "$ref": "#/definitions/rule",
+          "description": "abap2UI5 linter rule 'unused-namespace-declaration' — default severity: hint"
         },
         "unused-public-attribute": {
           "$ref": "#/definitions/rule",

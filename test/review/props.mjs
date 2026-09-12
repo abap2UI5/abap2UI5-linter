@@ -395,7 +395,10 @@ ENDCLASS.
     assert(assoc.length === 1 && assoc[0].member === 'ariaLabelledBy' && assoc[0].association === true && !assoc[0].suggestion && !assoc[0].fixes,
       `<ariaLabelledBy> as a child tag is reported, with no did-you-mean and no fix (got ${assoc.map((x) => `${x.member} assoc=${x.association} suggestion=${x.suggestion}`).join(',') || 'nothing'})`);
     assert(/association/.test(assoc[0]?.message || '') && /attribute/.test(assoc[0]?.message || ''), `the message says what to write instead (${assoc[0]?.message})`);
-    assert(!checkXmlSource(xmlView('  <Label id="lbl" text="x"/>\n  <Button text="b" ariaLabelledBy="lbl"/>'), o).findings.length,
+    // (the frame's root declares prefixes this view does not use - that is the
+    // unused-namespace-declaration hint's business, not this section's)
+    assert(!checkXmlSource(xmlView('  <Label id="lbl" text="x"/>\n  <Button text="b" ariaLabelledBy="lbl"/>'), o).findings
+      .filter((x) => x.type !== 'unused-namespace-declaration').length,
       'the attribute form is fine');
     const abapAssoc = only(checkAbapSource(cls(`        )->ele( \`Button\`
             )->ele( \`ariaLabelledBy\` ).`), o), 'unknown-aggregation');
