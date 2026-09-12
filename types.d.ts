@@ -246,6 +246,12 @@ declare module "@abap2ui5/linter/reconstruct" {
    *  row, so rules that judge the VALUE must not fire on it. */
   export const SKIP: unique symbol;
 
+  /** What `a( t = … )` does to its value before the XML escaping - the
+   *  builder's own `escape_literal( )`: the backslash first, then the
+   *  braces. Mirrored so a `t` attribute reconstructs to what the running
+   *  view carries. */
+  export function escapeLiteral(value: unknown): string;
+
   /** The client-side binding a `client->_bind( … )` / `_bind_edit( … )` call
    *  produces, or null when the expression is not a lone bind call (or passes
    *  a shape-CHANGING named argument, which stays unresolved on purpose). */
