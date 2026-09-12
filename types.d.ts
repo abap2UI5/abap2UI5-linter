@@ -702,6 +702,13 @@ declare module "@abap2ui5/linter/findings" {
     source: string
   ): T[];
 
+  /** Attaches the unused-namespace-declaration fix - the declaring `a( )`
+   *  call deleted with its line, only where the call has the line to itself. */
+  export function attachUnusedNamespaceFixes<T extends PropertyFinding>(
+    findings: T[],
+    source: string
+  ): T[];
+
   /** Attaches the json-bind-on-scalar-property fix - the `json = abap_true`
    *  argument deleted from the reported attribute's `_bind( )`. Judged on the
    *  reconstructed view, so the source span is found here. */
